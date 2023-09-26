@@ -52,10 +52,19 @@ namespace EcommerceAPI.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(cart).State = EntityState.Modified;
-
             try
             {
+                Cart existing = _context.Cart.Find(id);
+
+                if (existing.ItemName == cart.ItemName && existing.UnitPrice == cart.UnitPrice) 
+                { 
+                    existing.Quantity += cart.Quantity;
+                }
+                else
+                {
+                    _context.Entry(cart).State = EntityState.Modified;
+                }
+
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
