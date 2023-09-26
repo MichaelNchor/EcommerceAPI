@@ -20,11 +20,13 @@ namespace EcommerceAPI.Models
         }
 
         public virtual DbSet<Cart> Cart { get; set; }
+        public virtual DbSet<Product> Product { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 optionsBuilder.UseSqlServer("Server=DESKTOP-K5527T2\\SQLEXPRESS;Database=EcommerceAPI;Trusted_Connection=True;");
             }
         }
@@ -33,17 +35,39 @@ namespace EcommerceAPI.Models
         {
             modelBuilder.Entity<Cart>(entity =>
             {
-                entity.HasKey(e => e.ItemId)
+                entity.HasKey(e => e.CartId)
+                    .HasName("PK2")
+                    .IsClustered(false);
+
+                entity.Property(e => e.CartId).HasColumnName("CartID");
+
+                entity.Property(e => e.AddedOn).HasColumnType("datetime");
+
+                entity.Property(e => e.ProductId).HasColumnName("ProductID");
+
+                entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.Cart)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("RefProduct2");
+            });
+
+            modelBuilder.Entity<Product>(entity =>
+            {
+                entity.HasKey(e => e.ProductId)
                     .HasName("PK1")
                     .IsClustered(false);
 
-                entity.Property(e => e.ItemId).HasColumnName("ItemID");
+                entity.Property(e => e.ProductId).HasColumnName("ProductID");
 
-                entity.Property(e => e.ItemName)
-                    .IsRequired()
-                    .HasMaxLength(400);
+                entity.Property(e => e.CreatedOn).HasColumnType("datetime");
 
-                entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 0)");
+                entity.Property(e => e.ProductName).HasMaxLength(400);
+
+                entity.Property(e => e.UnitPrice).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
             });
 
             OnModelCreatingPartial(modelBuilder);

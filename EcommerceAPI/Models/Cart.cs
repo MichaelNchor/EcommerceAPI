@@ -9,9 +9,12 @@ namespace EcommerceAPI.Models
 {
     public partial class Cart
     {
-        public int ItemId { get; set; }
-        public string ItemName { get; set; }
+        public int CartId { get; set; }
+        public int? ProductId { get; set; }
         public int? Quantity { get; set; }
-        public decimal? UnitPrice { get; set; }
+        public DateTime? AddedOn { get; set; }
+        public DateTime? UpdatedOn { get; set; }
+
+        public virtual Product Product { get; set; }
     }
 }
