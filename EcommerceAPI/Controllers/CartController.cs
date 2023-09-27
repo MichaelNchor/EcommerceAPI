@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EcommerceAPI.Models;
 using EcommerceAPI.DTO.Cart;
+using EcommerceAPI.DTO.Product;
 
 namespace EcommerceAPI.Controllers
 {
@@ -30,16 +31,26 @@ namespace EcommerceAPI.Controllers
 
         // GET: api/User/5
         [HttpGet("GetCartItemByID/{id}")]
-        public async Task<ActionResult<Cart>> GetCartItem(int id)
+        public async Task<ActionResult<CartGetDTO>> GetCartItem(int id)
         {
-            Cart cart = await _context.Cart.FindAsync(id);
+            var cart = await _context.Cart.FindAsync(id);
 
             if (cart == null)
             {
                 return NotFound("Cart Item doesn't exist!");
             }
 
-            return cart;
+            var result = new CartGetDTO()
+            {
+                CartId = cart.CartId,
+                ProductId = cart.ProductId,
+                ProductName = cart.Product.ProductName,
+                UnitPrice = cart.Product.UnitPrice,
+                AddedOn = cart.AddedOn,
+                UpdatedOn = cart.UpdatedOn,
+            };
+
+            return result;
         }
 
         // POST: api/User
@@ -53,7 +64,7 @@ namespace EcommerceAPI.Controllers
                 return NotFound("Product doesn't exist! Add another.");
             }
 
-            Cart cart;
+            Cart cart; CartAddDTO result;
 
             try
             {
@@ -70,7 +81,7 @@ namespace EcommerceAPI.Controllers
                 }
                 else
                 {
-                    Product product = await _context.Product.FirstOrDefaultAsync(c => c.ProductId == productID);
+                    var product = await _context.Product.FirstOrDefaultAsync(c => c.ProductId == productID);
 
                     cart = new Cart()
                     {
@@ -80,24 +91,23 @@ namespace EcommerceAPI.Controllers
                         UpdatedOn = DateTime.UtcNow,
                         Product = product,
                     };
-
                     _context.Cart.Add(cart);
                 }
+
+                result = new CartAddDTO()
+                {
+                    CartId = cart.CartId,
+                    ProductId = cart.ProductId,
+                    ProductName = cart.Product?.ProductName,
+                    UnitPrice = cart.Product?.UnitPrice,
+                    AddedOn = cart.AddedOn,
+                    UpdatedOn = cart.UpdatedOn,
+                };
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.ToString());
             }
-
-            var result = new CartAddDTO()
-            {
-                CartId = cart.CartId,
-                ProductId = cart.ProductId,
-                ProductName = cart.Product?.ProductName,
-                UnitPrice = cart.Product?.UnitPrice,
-                AddedOn = cart.AddedOn,
-                UpdatedOn = cart.UpdatedOn,
-            };
 
             await _context.SaveChangesAsync();
 
