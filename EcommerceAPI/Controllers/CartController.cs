@@ -44,8 +44,8 @@ namespace EcommerceAPI.Controllers
             {
                 CartId = cart.CartId,
                 ProductId = cart.ProductId,
-                ProductName = cart.Product.ProductName,
-                UnitPrice = cart.Product.UnitPrice,
+                ProductName = cart.Product?.ProductName,
+                UnitPrice = cart.Product?.UnitPrice,
                 AddedOn = cart.AddedOn,
                 UpdatedOn = cart.UpdatedOn,
             };
