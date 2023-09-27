@@ -10,6 +10,6 @@ namespace EcommerceAPI.DTO.Cart
         public decimal? UnitPrice { get; set; }
         public int? Quantity { get; set; }
         public DateTime? AddedOn { get; set; }
-        public DateTime? UpdatedOn { get; set; }
+        public DateTime? DeletedOn { get; set; }
     }
 }

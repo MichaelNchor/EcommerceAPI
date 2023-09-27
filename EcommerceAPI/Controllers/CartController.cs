@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using EcommerceAPI.Models;
 using EcommerceAPI.DTO.Cart;
 using EcommerceAPI.DTO.Product;
+using Microsoft.CodeAnalysis;
 
 namespace EcommerceAPI.Controllers
 {
@@ -23,29 +24,45 @@ namespace EcommerceAPI.Controllers
         }
 
         // GET: api/User
-        [HttpGet("GetAllCartItems")]
-        public async Task<ActionResult<IEnumerable<Cart>>> GetCartItem()
+        [HttpGet("GetCartItems")]
+        public async Task<ActionResult<IEnumerable<CartGetDTO>>> GetCartItem()
         {
-            return await _context.Cart.ToListAsync();
+            var carts = await _context.Cart.Include(c => c.Product).ToListAsync();
+
+            //Reshape response
+            var result = carts.Select(p => new CartGetDTO()
+            {
+                CartId = p.CartId,
+                ProductId = p.Product.FirstOrDefault().ProductId,
+                ProductName = p.Product.FirstOrDefault().ProductName,
+                UnitPrice = p.Product.FirstOrDefault().UnitPrice,
+                Quantity = p.Quantity,
+                AddedOn = p.AddedOn,
+                UpdatedOn = p.UpdatedOn,
+            });
+
+            return Ok(result);
         }
 
         // GET: api/User/5
         [HttpGet("GetCartItemByID/{id}")]
-        public async Task<ActionResult<CartGetDTO>> GetCartItem(int id)
+        public ActionResult<CartGetDTO> GetCartItem(int id)
         {
-            var cart = await _context.Cart.FindAsync(id);
+            var cart = _context.Cart.Include(c => c.Product).FirstOrDefault(c => c.Product.Any(p => p.CartId == id));
 
             if (cart == null)
             {
                 return NotFound("Cart Item doesn't exist!");
             }
 
+            //Reshape response
             var result = new CartGetDTO()
             {
                 CartId = cart.CartId,
-                ProductId = cart.ProductId,
-                ProductName = cart.Product?.ProductName,
-                UnitPrice = cart.Product?.UnitPrice,
+                ProductId = cart.Product.FirstOrDefault().ProductId,
+                ProductName = cart.Product.FirstOrDefault().ProductName,
+                UnitPrice  = cart.Product.FirstOrDefault().UnitPrice,
+                Quantity = cart.Quantity,
                 AddedOn = cart.AddedOn,
                 UpdatedOn = cart.UpdatedOn,
             };
@@ -68,11 +85,11 @@ namespace EcommerceAPI.Controllers
 
             try
             {
-                bool hasProduct = _context.Cart.Any(e => e.ProductId == productID);
+                bool hasProduct = CartExistsWithProduct(productID);
 
                 if (hasProduct)
                 {
-                    cart = await _context.Cart.FirstOrDefaultAsync(c => c.ProductId == productID);
+                    cart = _context.Cart.Include(c => c.Product).FirstOrDefault(c => c.Product.Any(p => p.ProductId == productID));
 
                     cart.Quantity += quantity;
                     cart.UpdatedOn = DateTime.UtcNow;
@@ -85,24 +102,15 @@ namespace EcommerceAPI.Controllers
 
                     cart = new Cart()
                     {
-                        ProductId = productID,
                         Quantity = quantity,
                         AddedOn = DateTime.UtcNow,
                         UpdatedOn = DateTime.UtcNow,
-                        Product = product,
                     };
+
+                    cart.Product.Add(product);
+
                     _context.Cart.Add(cart);
                 }
-
-                result = new CartAddDTO()
-                {
-                    CartId = cart.CartId,
-                    ProductId = cart.ProductId,
-                    ProductName = cart.Product?.ProductName,
-                    UnitPrice = cart.Product?.UnitPrice,
-                    AddedOn = cart.AddedOn,
-                    UpdatedOn = cart.UpdatedOn,
-                };
             }
             catch (Exception ex)
             {
@@ -110,6 +118,20 @@ namespace EcommerceAPI.Controllers
             }
 
             await _context.SaveChangesAsync();
+
+            var c = _context.Cart.Include(c => c.Product).FirstOrDefault(c => c.Product.Any(p => p.CartId == productID));
+
+            //Reshape response
+            result = new CartAddDTO()
+            {
+                CartId = cart.CartId,
+                ProductId = c.Product.FirstOrDefault().ProductId,
+                ProductName = c.Product.FirstOrDefault().ProductName,
+                UnitPrice = c.Product.FirstOrDefault().UnitPrice,
+                Quantity = cart.Quantity,
+                AddedOn = cart.AddedOn,
+                UpdatedOn = cart.UpdatedOn,
+            };
 
             return CreatedAtAction("GetCartItem", new { id = result.CartId }, result);
         }
@@ -127,25 +149,28 @@ namespace EcommerceAPI.Controllers
 
             _context.Cart.Remove(cart);
 
+            await _context.SaveChangesAsync();
+
+            var c = _context.Cart.Include(c => c.Product).FirstOrDefault(c => c.Product.Any(p => p.CartId == id));
+
+            //Reshape response
             var result = new CartDeleteDTO()
             {
                 CartId = cart.CartId,
-                ProductId = cart.ProductId,
-                ProductName = cart.Product?.ProductName,
+                ProductId = c.Product.FirstOrDefault().ProductId,
+                ProductName = c.Product.FirstOrDefault().ProductName,
+                UnitPrice = c.Product.FirstOrDefault().UnitPrice,
                 Quantity = cart.Quantity,
-                UnitPrice = cart.Product?.UnitPrice,
                 AddedOn = cart.AddedOn,
-                UpdatedOn = cart.UpdatedOn,
+                DeletedOn = DateTime.UtcNow,
             };
-
-            await _context.SaveChangesAsync();
 
             return result;
         }
 
-        private bool CartExists(int id)
+        private bool CartExistsWithProduct(int id)
         {
-            return _context.Cart.Any(e => e.CartId == id);
+            return _context.Cart.Include(c => c.Product).Any(p => p.Product.Any(p => p.ProductId == id));
         }
 
         private bool ProductExists(int id)

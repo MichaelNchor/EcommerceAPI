@@ -9,12 +9,16 @@ namespace EcommerceAPI.Models
 {
     public partial class Cart
     {
+        public Cart()
+        {
+            Product = new HashSet<Product>();
+        }
+
         public int CartId { get; set; }
-        public int ProductId { get; set; }
         public int? Quantity { get; set; }
         public DateTime? AddedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }
 
-        public virtual Product Product { get; set; }
+        public virtual ICollection<Product> Product { get; set; }
     }
 }

@@ -26,7 +26,6 @@ namespace EcommerceAPI.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 optionsBuilder.UseSqlServer("Server=DESKTOP-K5527T2\\SQLEXPRESS;Database=EcommerceAPI;Trusted_Connection=True;");
             }
         }
@@ -43,15 +42,7 @@ namespace EcommerceAPI.Models
 
                 entity.Property(e => e.AddedOn).HasColumnType("datetime");
 
-                entity.Property(e => e.ProductId).HasColumnName("ProductID");
-
                 entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
-
-                entity.HasOne(d => d.Product)
-                    .WithMany(p => p.Cart)
-                    .HasForeignKey(d => d.ProductId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("RefProduct2");
             });
 
             modelBuilder.Entity<Product>(entity =>
@@ -62,6 +53,8 @@ namespace EcommerceAPI.Models
 
                 entity.Property(e => e.ProductId).HasColumnName("ProductID");
 
+                entity.Property(e => e.CartId).HasColumnName("CartID");
+
                 entity.Property(e => e.CreatedOn).HasColumnType("datetime");
 
                 entity.Property(e => e.ProductName).HasMaxLength(400);
@@ -69,6 +62,11 @@ namespace EcommerceAPI.Models
                 entity.Property(e => e.UnitPrice).HasColumnType("decimal(10, 2)");
 
                 entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Cart)
+                    .WithMany(p => p.Product)
+                    .HasForeignKey(d => d.CartId)
+                    .HasConstraintName("RefCart4");
             });
 
             OnModelCreatingPartial(modelBuilder);

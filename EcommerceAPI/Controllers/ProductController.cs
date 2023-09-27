@@ -26,6 +26,7 @@ namespace EcommerceAPI.Controllers
         public async Task<ActionResult<IEnumerable<ProductGetDTO>>> GetProduct()
         {
             var products = await _context.Product.ToListAsync();
+
             var result = products.Select(p => new ProductGetDTO
             {
                 ProductId = p.ProductId,
@@ -117,6 +118,7 @@ namespace EcommerceAPI.Controllers
             };
 
             _context.Product.Add(p);
+
             await _context.SaveChangesAsync();
 
             var result = new ProductAddDTO()
@@ -141,6 +143,7 @@ namespace EcommerceAPI.Controllers
             }
 
             _context.Product.Remove(product);
+
             await _context.SaveChangesAsync();
 
             var result = new ProductDeleteDTO()
