@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EcommerceAPI.Models;
+using EcommerceAPI.DTO.Product;
 
 namespace EcommerceAPI.Controllers
 {
@@ -22,14 +23,24 @@ namespace EcommerceAPI.Controllers
 
         // GET: api/Admin
         [HttpGet("GetAllProducts")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProduct()
+        public async Task<ActionResult<IEnumerable<ProductGetDTO>>> GetProduct()
         {
-            return await _context.Product.ToListAsync();
+            var products = await _context.Product.ToListAsync();
+            var result = products.Select(p => new ProductGetDTO
+            {
+                ProductId = p.ProductId,
+                ProductName = p.ProductName,
+                UnitPrice = p.UnitPrice,
+                CreatedOn = p.CreatedOn,
+                UpdatedOn = p.UpdatedOn
+            });
+
+            return Ok(result);
         }
 
         // GET: api/Admin/5
         [HttpGet("GetProductByID/{id}")]
-        public async Task<ActionResult<Product>> GetProduct(int id)
+        public async Task<ActionResult<ProductGetDTO>> GetProduct(int id)
         {
             var product = await _context.Product.FindAsync(id);
 
@@ -38,21 +49,39 @@ namespace EcommerceAPI.Controllers
                 return NotFound();
             }
 
-            return product;
+            var result = new ProductGetDTO()
+            {
+                ProductId = product.ProductId,
+                ProductName = product.ProductName,
+                UnitPrice = product.UnitPrice,
+                CreatedOn = DateTime.UtcNow,
+                UpdatedOn = product.UpdatedOn,
+            };
+
+            return result;
         }
 
         // PUT: api/Admin/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("UpdateProductByID/{id}")]
-        public async Task<IActionResult> PutProduct(int id, Product product)
+        public async Task<IActionResult> PutProduct(int id, ProductPutDTO product)
         {
-            if (id != product.ProductId)
+            var p = new Product()
+            {
+                ProductId = id,
+                ProductName = product.ProductName,
+                UnitPrice = product.UnitPrice,
+                CreatedOn = product.CreatedOn,
+                UpdatedOn = DateTime.UtcNow,
+            };
+
+            if (id != p.ProductId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(product).State = EntityState.Modified;
+            _context.Entry(p).State = EntityState.Modified;
 
             try
             {
@@ -77,17 +106,33 @@ namespace EcommerceAPI.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost("AddProduct")]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
+        public async Task<ActionResult<ProductAddDTO>> PostProduct(ProductAddDTO product)
         {
-            _context.Product.Add(product);
+            var p = new Product()
+            {
+                ProductName = product.ProductName,
+                UnitPrice = product.UnitPrice,
+                CreatedOn = DateTime.UtcNow,
+                UpdatedOn = DateTime.UtcNow,
+            };
+
+            _context.Product.Add(p);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProduct", new { id = product.ProductId }, product);
+            var result = new ProductAddDTO()
+            {
+                ProductId = product.ProductId,
+                ProductName = product.ProductName,
+                UnitPrice = product.UnitPrice,
+                CreatedOn = DateTime.UtcNow,
+            };
+
+            return CreatedAtAction("GetProduct", new { id = result.ProductId }, result);
         }
 
         // DELETE: api/Admin/5
         [HttpDelete("DeleteProductById/{id}")]
-        public async Task<ActionResult<Product>> DeleteProduct(int id)
+        public async Task<ActionResult<ProductDeleteDTO>> DeleteProduct(int id)
         {
             var product = await _context.Product.FindAsync(id);
             if (product == null)
@@ -98,7 +143,15 @@ namespace EcommerceAPI.Controllers
             _context.Product.Remove(product);
             await _context.SaveChangesAsync();
 
-            return product;
+            var result = new ProductDeleteDTO()
+            {
+                ProductId = product.ProductId,
+                ProductName = product.ProductName,
+                UnitPrice = product.UnitPrice,
+                DeletedOn = DateTime.UtcNow,
+            };
+
+            return result;
         }
 
         private bool ProductExists(int id)

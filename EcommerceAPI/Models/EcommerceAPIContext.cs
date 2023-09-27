@@ -35,15 +35,17 @@ namespace EcommerceAPI.Models
         {
             modelBuilder.Entity<Cart>(entity =>
             {
-                entity.HasKey(e => e.CartId)
+                entity.HasKey(e => new { e.CartId, e.ProductId })
                     .HasName("PK2")
                     .IsClustered(false);
 
-                entity.Property(e => e.CartId).HasColumnName("CartID");
-
-                entity.Property(e => e.AddedOn).HasColumnType("datetime");
+                entity.Property(e => e.CartId)
+                    .HasColumnName("CartID")
+                    .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.ProductId).HasColumnName("ProductID");
+
+                entity.Property(e => e.AddedOn).HasColumnType("datetime");
 
                 entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
 
