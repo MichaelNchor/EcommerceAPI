@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EcommerceAPI.Models;
+using EcommerceAPI.DTO.Cart;
 
 namespace EcommerceAPI.Controllers
 {
@@ -45,7 +46,7 @@ namespace EcommerceAPI.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost("AddItemToCart")]
-        public async Task<ActionResult<Cart>> AddToCartItem(int productID, int quantity = 1)
+        public async Task<ActionResult<CartAddDTO>> AddToCartItem(int productID, int quantity = 1)
         {
             if (!ProductExists(productID))
             {
@@ -69,12 +70,15 @@ namespace EcommerceAPI.Controllers
                 }
                 else
                 {
+                    Product product = await _context.Product.FirstOrDefaultAsync(c => c.ProductId == productID);
+
                     cart = new Cart()
                     {
                         ProductId = productID,
                         Quantity = quantity,
                         AddedOn = DateTime.UtcNow,
                         UpdatedOn = DateTime.UtcNow,
+                        Product = product,
                     };
 
                     _context.Cart.Add(cart);
@@ -85,16 +89,27 @@ namespace EcommerceAPI.Controllers
                 throw new Exception(ex.ToString());
             }
 
+            var result = new CartAddDTO()
+            {
+                CartId = cart.CartId,
+                ProductId = cart.ProductId,
+                ProductName = cart.Product.ProductName,
+                UnitPrice = cart.Product.UnitPrice,
+                AddedOn = cart.AddedOn,
+                UpdatedOn = cart.UpdatedOn,
+            };
+
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCartItem", new { id = cart.CartId }, cart);
+            return CreatedAtAction("GetCartItem", new { id = result.CartId }, result);
         }
 
         // DELETE: api/User/5
         [HttpDelete("RemoveItemToCart/{id}")]
-        public async Task<ActionResult<Cart>> DeleteCartItem(int id)
+        public async Task<ActionResult<CartDeleteDTO>> DeleteCartItem(int id)
         {
             var cart = await _context.Cart.FindAsync(id);
+
             if (cart == null)
             {
                 return NotFound("Cart Item doesn't exist!");
@@ -102,9 +117,20 @@ namespace EcommerceAPI.Controllers
 
             _context.Cart.Remove(cart);
 
+            var result = new CartDeleteDTO()
+            {
+                CartId = cart.CartId,
+                ProductId = cart.ProductId,
+                ProductName = cart.Product?.ProductName,
+                Quantity = cart.Quantity,
+                UnitPrice = cart.Product?.UnitPrice,
+                AddedOn = cart.AddedOn,
+                UpdatedOn = cart.UpdatedOn,
+            };
+
             await _context.SaveChangesAsync();
 
-            return cart;
+            return result;
         }
 
         private bool CartExists(int id)
