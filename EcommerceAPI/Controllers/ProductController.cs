@@ -9,13 +9,13 @@ using EcommerceAPI.Models;
 
 namespace EcommerceAPI.Controllers
 {
-    [Route("api/[controller]/Products")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class AdminController : ControllerBase
+    public class ProductController : ControllerBase
     {
         private readonly EcommerceAPIContext _context;
 
-        public AdminController(EcommerceAPIContext context)
+        public ProductController(EcommerceAPIContext context)
         {
             _context = context;
         }

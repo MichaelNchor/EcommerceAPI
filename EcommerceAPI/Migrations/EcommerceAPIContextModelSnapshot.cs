@@ -30,7 +30,7 @@ namespace EcommerceAPI.Migrations
                     b.Property<DateTime?>("AddedOn")
                         .HasColumnType("datetime");
 
-                    b.Property<int?>("ProductId")
+                    b.Property<int>("ProductId")
                         .HasColumnName("ProductID")
                         .HasColumnType("int");
 
@@ -43,8 +43,6 @@ namespace EcommerceAPI.Migrations
                     b.HasKey("CartId")
                         .HasName("PK2")
                         .HasAnnotation("SqlServer:Clustered", false);
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("Cart");
                 });
@@ -75,14 +73,6 @@ namespace EcommerceAPI.Migrations
                         .HasAnnotation("SqlServer:Clustered", false);
 
                     b.ToTable("Product");
-                });
-
-            modelBuilder.Entity("EcommerceAPI.Models.Cart", b =>
-                {
-                    b.HasOne("EcommerceAPI.Models.Product", "Product")
-                        .WithMany("Cart")
-                        .HasForeignKey("ProductId")
-                        .HasConstraintName("RefProduct2");
                 });
 #pragma warning restore 612, 618
         }

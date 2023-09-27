@@ -10,7 +10,7 @@ namespace EcommerceAPI.Models
     public partial class Cart
     {
         public int CartId { get; set; }
-        public int? ProductId { get; set; }
+        public int ProductId { get; set; }
         public int? Quantity { get; set; }
         public DateTime? AddedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }

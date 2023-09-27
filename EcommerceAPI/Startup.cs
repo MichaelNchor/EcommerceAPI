@@ -37,9 +37,9 @@ namespace EcommerceAPI
             {
                 options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
                 {
-                    Title = "Place Info Service API",
+                    Title = "Ecommerce API",
                     Version = "v1",
-                    Description = "Sample service for Learner",
+                    Description = "An API to be used to unify the e-commerce cart experience for users",
                 });
             });
         }
