@@ -21,7 +21,7 @@ namespace EcommerceAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Admin
+        // GET: api/Product
         [HttpGet("GetProducts")]
         public async Task<ActionResult<IEnumerable<ProductGetDTO>>> GetProducts()
         {
@@ -39,7 +39,7 @@ namespace EcommerceAPI.Controllers
             return Ok(result);
         }
 
-        // GET: api/Admin/5
+        // GET: api/Product/5
         [HttpGet("GetProduct/{id}")]
         public async Task<ActionResult<ProductGetDTO>> GetProduct(int id)
         {
@@ -62,7 +62,7 @@ namespace EcommerceAPI.Controllers
             return result;
         }
 
-        // PUT: api/Admin/5
+        // PUT: api/Product/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("UpdateProduct/{id}")]
@@ -103,7 +103,7 @@ namespace EcommerceAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/Admin
+        // POST: api/Product
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost("AddProduct")]
@@ -132,7 +132,7 @@ namespace EcommerceAPI.Controllers
             return CreatedAtAction("GetProduct", new { id = result.ProductId }, result);
         }
 
-        // DELETE: api/Admin/5
+        // DELETE: api/Product/5
         [HttpDelete("DeleteProduct/{id}")]
         public async Task<ActionResult<ProductDeleteDTO>> DeleteProduct(int id)
         {

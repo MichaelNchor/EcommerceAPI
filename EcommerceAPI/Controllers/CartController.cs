@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using EcommerceAPI.Models;
 using EcommerceAPI.DTO.Product;
 using Microsoft.CodeAnalysis;
+using System.Net;
 
 namespace EcommerceAPI.Controllers
 {
@@ -22,7 +23,7 @@ namespace EcommerceAPI.Controllers
             _context = context;
         }
 
-        // GET: api/User
+        // GET: api/Cart
         [HttpGet("GetCartItems")]
         public async Task<ActionResult<IEnumerable<Cart>>> GetCartItem()
         {
@@ -48,8 +49,47 @@ namespace EcommerceAPI.Controllers
             return Ok(result);
         }
 
-        // GET: api/User/5
-        [HttpGet("GetCartItemByID/{id}")]
+        // GET: api/carts/products
+        [HttpGet("GetCartItemsQueryable")]
+        public async Task<IActionResult> GetCartProductsAsync([FromQuery] string searchValue, decimal? min, decimal? max)
+        {
+            var query = _context.Cart.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchValue))
+            {
+                // Filter carts based on the searchValue (e.g., quantity, product name, etc.)
+                query = query.Where(cart =>
+                    cart.Quantity.ToString().Contains(searchValue) ||
+                    cart.Product.Any(product => product.ProductName.Contains(searchValue) || 
+                    product.UnitPrice.ToString().Contains(searchValue) ||
+                    product.UnitPrice >= min && product.UnitPrice <= max)
+                );
+            }
+
+            var carts = await query.Include(cart => cart.Product).ToListAsync();
+
+            // Reshape response
+            var result = carts.Select(cart => new
+            {
+                CartId = cart.CartId,
+                Quantity = cart.Quantity,
+                AddedOn = cart.AddedOn,
+                UpdatedOn = cart.UpdatedOn,
+                Products = cart.Product.Select(product => new
+                {
+                    ProductId = product.ProductId,
+                    ProductName = product.ProductName,
+                    UnitPrice = product.UnitPrice,
+                    CreatedOn = product.CreatedOn,
+                    UpdatedOn = product.UpdatedOn,
+                }).ToList()
+            });
+
+            return Ok(result);
+        }
+
+        // GET: api/Cart/5
+        [HttpGet("GetCartItem/{id}")]
         public async Task<ActionResult<Cart>> GetCartItem(int id)
         {
             var cart = await _context.Cart.Include(c => c.Product).FirstOrDefaultAsync(c => c.Product.Any(p => p.CartId == id));
@@ -79,7 +119,7 @@ namespace EcommerceAPI.Controllers
             return Ok(result);
         }
 
-        // POST: api/User
+        // POST: api/Cart
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost("AddItemToCart")]
@@ -148,7 +188,7 @@ namespace EcommerceAPI.Controllers
             }
         }
 
-        // DELETE: api/User/5
+        // DELETE: api/Cart/5
         [HttpDelete("RemoveItemToCart/{id}")]
         public async Task<ActionResult<Cart>> DeleteCartItem(int id)
         {
