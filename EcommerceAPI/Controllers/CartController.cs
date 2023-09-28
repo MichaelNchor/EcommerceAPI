@@ -51,7 +51,7 @@ namespace EcommerceAPI.Controllers
 
         // GET: api/carts/products
         [HttpGet("GetCartItemsQueryable")]
-        public async Task<IActionResult> GetCartProductsAsync([FromQuery] string searchValue, decimal? min, decimal? max)
+        public async Task<IActionResult> GetCartProductsAsync([FromQuery] string searchValue, decimal? min = 0, decimal? max = 10000000000)
         {
             var query = _context.Cart.AsQueryable();
 
@@ -61,7 +61,7 @@ namespace EcommerceAPI.Controllers
                 query = query.Where(cart =>
                     cart.Quantity.ToString().Contains(searchValue) ||
                     cart.Product.Any(product => product.ProductName.Contains(searchValue) || 
-                    product.UnitPrice.ToString().Contains(searchValue) ||
+                    product.UnitPrice.ToString().Contains(searchValue) &&
                     product.UnitPrice >= min && product.UnitPrice <= max)
                 );
             }
