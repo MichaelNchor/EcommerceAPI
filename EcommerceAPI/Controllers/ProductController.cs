@@ -22,8 +22,8 @@ namespace EcommerceAPI.Controllers
         }
 
         // GET: api/Admin
-        [HttpGet("GetAllProducts")]
-        public async Task<ActionResult<IEnumerable<ProductGetDTO>>> GetProduct()
+        [HttpGet("GetProducts")]
+        public async Task<ActionResult<IEnumerable<ProductGetDTO>>> GetProducts()
         {
             var products = await _context.Product.ToListAsync();
 
@@ -40,7 +40,7 @@ namespace EcommerceAPI.Controllers
         }
 
         // GET: api/Admin/5
-        [HttpGet("GetProductByID/{id}")]
+        [HttpGet("GetProduct/{id}")]
         public async Task<ActionResult<ProductGetDTO>> GetProduct(int id)
         {
             var product = await _context.Product.FindAsync(id);
@@ -65,7 +65,7 @@ namespace EcommerceAPI.Controllers
         // PUT: api/Admin/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("UpdateProductByID/{id}")]
+        [HttpPut("UpdateProduct/{id}")]
         public async Task<IActionResult> PutProduct(int id, ProductPutDTO product)
         {
             var p = new Product()
@@ -133,7 +133,7 @@ namespace EcommerceAPI.Controllers
         }
 
         // DELETE: api/Admin/5
-        [HttpDelete("DeleteProductById/{id}")]
+        [HttpDelete("DeleteProduct/{id}")]
         public async Task<ActionResult<ProductDeleteDTO>> DeleteProduct(int id)
         {
             var product = await _context.Product.FindAsync(id);

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EcommerceAPI.Models;
-using EcommerceAPI.DTO.Cart;
 using EcommerceAPI.DTO.Product;
 using Microsoft.CodeAnalysis;
 
@@ -129,8 +128,6 @@ namespace EcommerceAPI.Controllers
 
             await _context.SaveChangesAsync();
 
-            var c = _context.Cart.Include(c => c.Product).FirstOrDefault(c => c.Product.Any(p => p.CartId == productID));
-
             //Reshape response
             var result = new
             {
@@ -162,30 +159,19 @@ namespace EcommerceAPI.Controllers
                 return NotFound("Cart Item doesn't exist!");
             }
 
+            // Check if there are related products associated with this cart
+            var relatedProducts = _context.Product.Where(p => p.CartId == id).ToList();
+
+            if (relatedProducts.Count > 0)
+            {
+                _context.Product.RemoveRange(relatedProducts);
+            }
+
             _context.Cart.Remove(cart);
 
             await _context.SaveChangesAsync();
 
-            var c = _context.Cart.Include(c => c.Product).FirstOrDefault(c => c.Product.Any(p => p.CartId == id));
-
-            //Reshape response
-            var result = new
-            {
-                CartId = cart.CartId,
-                Quantity = cart.Quantity,
-                AddedOn = cart.AddedOn,
-                UpdatedOn = cart.UpdatedOn,
-                Products = cart.Product.Select(product => new
-                {
-                    ProductId = product.ProductId,
-                    ProductName = product.ProductName,
-                    UnitPrice = product.UnitPrice,
-                    CreatedOn = product.CreatedOn,
-                    UpdatedOn = product.UpdatedOn,
-                }).ToList()
-            };
-
-            return Ok(result);
+            return NoContent();
         }
 
         private bool CartExistsWithProduct(int id)
