@@ -120,15 +120,57 @@ namespace EcommerceAPI.Controllers
 
                     _context.Cart.Add(cart);
                 }
+
+                await _context.SaveChangesAsync();
+
+                //Reshape response
+                var result = new
+                {
+                    CartId = cart.CartId,
+                    Quantity = cart.Quantity,
+                    AddedOn = cart.AddedOn,
+                    UpdatedOn = cart.UpdatedOn,
+                    Products = cart.Product.Select(product => new
+                    {
+                        ProductId = product.ProductId,
+                        ProductName = product.ProductName,
+                        UnitPrice = product.UnitPrice,
+                        CreatedOn = product.CreatedOn,
+                        UpdatedOn = product.UpdatedOn,
+                    }).ToList()
+                };
+
+                return CreatedAtAction("GetCartItem", new { id = result.CartId }, result);
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.ToString());
             }
+        }
+
+        // DELETE: api/User/5
+        [HttpDelete("RemoveItemToCart/{id}")]
+        public async Task<ActionResult<Cart>> DeleteCartItem(int id)
+        {
+            var cart = await _context.Cart.FindAsync(id);
+
+            if (cart == null)
+            {
+                return NotFound("Cart Item doesn't exist!");
+            }
+
+            // Find all related products and update their CartId to null
+            var relatedProducts = _context.Product.Where(p => p.CartId == id).ToList();
+
+            foreach (var product in relatedProducts)
+            {
+                product.CartId = null;
+            }
+
+            _context.Cart.Remove(cart);
 
             await _context.SaveChangesAsync();
 
-            //Reshape response
             var result = new
             {
                 CartId = cart.CartId,
@@ -145,33 +187,7 @@ namespace EcommerceAPI.Controllers
                 }).ToList()
             };
 
-            return CreatedAtAction("GetCartItem", new { id = result.CartId }, result);
-        }
-
-        // DELETE: api/User/5
-        [HttpDelete("RemoveItemToCart/{id}")]
-        public async Task<ActionResult<Cart>> DeleteCartItem(int id)
-        {
-            var cart = await _context.Cart.FindAsync(id);
-
-            if (cart == null)
-            {
-                return NotFound("Cart Item doesn't exist!");
-            }
-
-            // Check if there are related products associated with this cart
-            var relatedProducts = _context.Product.Where(p => p.CartId == id).ToList();
-
-            if (relatedProducts.Count > 0)
-            {
-                _context.Product.RemoveRange(relatedProducts);
-            }
-
-            _context.Cart.Remove(cart);
-
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return Ok(result);
         }
 
         private bool CartExistsWithProduct(int id)
