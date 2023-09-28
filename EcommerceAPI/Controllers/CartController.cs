@@ -25,30 +25,35 @@ namespace EcommerceAPI.Controllers
 
         // GET: api/User
         [HttpGet("GetCartItems")]
-        public async Task<ActionResult<IEnumerable<CartGetDTO>>> GetCartItem()
+        public async Task<ActionResult<IEnumerable<Cart>>> GetCartItem()
         {
             var carts = await _context.Cart.Include(c => c.Product).ToListAsync();
 
             //Reshape response
-            var result = carts.Select(p => new CartGetDTO()
+            var result = carts.Select(cart => new
             {
-                CartId = p.CartId,
-                ProductId = p.Product.FirstOrDefault().ProductId,
-                ProductName = p.Product.FirstOrDefault().ProductName,
-                UnitPrice = p.Product.FirstOrDefault().UnitPrice,
-                Quantity = p.Quantity,
-                AddedOn = p.AddedOn,
-                UpdatedOn = p.UpdatedOn,
-            });
+                CartId = cart.CartId,
+                Quantity = cart.Quantity,
+                AddedOn = cart.AddedOn,
+                UpdatedOn = cart.UpdatedOn,
+                Products = cart.Product.Select(product => new
+                {
+                    ProductId = product.ProductId,
+                    ProductName = product.ProductName,
+                    UnitPrice = product.UnitPrice,
+                    CreatedOn = product.CreatedOn,
+                    UpdatedOn = product.UpdatedOn,
+                }).ToList()
+            }).ToList();
 
             return Ok(result);
         }
 
         // GET: api/User/5
         [HttpGet("GetCartItemByID/{id}")]
-        public ActionResult<CartGetDTO> GetCartItem(int id)
+        public async Task<ActionResult<Cart>> GetCartItem(int id)
         {
-            var cart = _context.Cart.Include(c => c.Product).FirstOrDefault(c => c.Product.Any(p => p.CartId == id));
+            var cart = await _context.Cart.Include(c => c.Product).FirstOrDefaultAsync(c => c.Product.Any(p => p.CartId == id));
 
             if (cart == null)
             {
@@ -56,32 +61,37 @@ namespace EcommerceAPI.Controllers
             }
 
             //Reshape response
-            var result = new CartGetDTO()
+            var result = new
             {
                 CartId = cart.CartId,
-                ProductId = cart.Product.FirstOrDefault().ProductId,
-                ProductName = cart.Product.FirstOrDefault().ProductName,
-                UnitPrice  = cart.Product.FirstOrDefault().UnitPrice,
                 Quantity = cart.Quantity,
                 AddedOn = cart.AddedOn,
                 UpdatedOn = cart.UpdatedOn,
+                Products = cart.Product.Select(product => new
+                {
+                    ProductId = product.ProductId,
+                    ProductName = product.ProductName,
+                    UnitPrice = product.UnitPrice,
+                    CreatedOn = product.CreatedOn,
+                    UpdatedOn = product.UpdatedOn,
+                }).ToList()
             };
 
-            return result;
+            return Ok(result);
         }
 
         // POST: api/User
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost("AddItemToCart")]
-        public async Task<ActionResult<CartAddDTO>> AddToCartItem(int productID, int quantity = 1)
+        public async Task<ActionResult<Cart>> AddToCartItem(int productID, int quantity = 1)
         {
             if (!ProductExists(productID))
             {
                 return NotFound("Product doesn't exist! Add another.");
             }
 
-            Cart cart; CartAddDTO result;
+            Cart cart;
 
             try
             {
@@ -122,15 +132,20 @@ namespace EcommerceAPI.Controllers
             var c = _context.Cart.Include(c => c.Product).FirstOrDefault(c => c.Product.Any(p => p.CartId == productID));
 
             //Reshape response
-            result = new CartAddDTO()
+            var result = new
             {
                 CartId = cart.CartId,
-                ProductId = c.Product.FirstOrDefault().ProductId,
-                ProductName = c.Product.FirstOrDefault().ProductName,
-                UnitPrice = c.Product.FirstOrDefault().UnitPrice,
                 Quantity = cart.Quantity,
                 AddedOn = cart.AddedOn,
                 UpdatedOn = cart.UpdatedOn,
+                Products = cart.Product.Select(product => new
+                {
+                    ProductId = product.ProductId,
+                    ProductName = product.ProductName,
+                    UnitPrice = product.UnitPrice,
+                    CreatedOn = product.CreatedOn,
+                    UpdatedOn = product.UpdatedOn,
+                }).ToList()
             };
 
             return CreatedAtAction("GetCartItem", new { id = result.CartId }, result);
@@ -138,7 +153,7 @@ namespace EcommerceAPI.Controllers
 
         // DELETE: api/User/5
         [HttpDelete("RemoveItemToCart/{id}")]
-        public async Task<ActionResult<CartDeleteDTO>> DeleteCartItem(int id)
+        public async Task<ActionResult<Cart>> DeleteCartItem(int id)
         {
             var cart = await _context.Cart.FindAsync(id);
 
@@ -154,18 +169,23 @@ namespace EcommerceAPI.Controllers
             var c = _context.Cart.Include(c => c.Product).FirstOrDefault(c => c.Product.Any(p => p.CartId == id));
 
             //Reshape response
-            var result = new CartDeleteDTO()
+            var result = new
             {
                 CartId = cart.CartId,
-                ProductId = c.Product.FirstOrDefault().ProductId,
-                ProductName = c.Product.FirstOrDefault().ProductName,
-                UnitPrice = c.Product.FirstOrDefault().UnitPrice,
                 Quantity = cart.Quantity,
                 AddedOn = cart.AddedOn,
-                DeletedOn = DateTime.UtcNow,
+                UpdatedOn = cart.UpdatedOn,
+                Products = cart.Product.Select(product => new
+                {
+                    ProductId = product.ProductId,
+                    ProductName = product.ProductName,
+                    UnitPrice = product.UnitPrice,
+                    CreatedOn = product.CreatedOn,
+                    UpdatedOn = product.UpdatedOn,
+                }).ToList()
             };
 
-            return result;
+            return Ok(result);
         }
 
         private bool CartExistsWithProduct(int id)
