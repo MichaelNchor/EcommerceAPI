@@ -120,8 +120,6 @@ namespace EcommerceAPI.Controllers
         }
 
         // POST: api/Cart
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost("AddItemToCart")]
         public async Task<ActionResult<Cart>> AddToCartItem(int productID, int quantity = 1)
         {

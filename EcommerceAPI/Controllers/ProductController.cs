@@ -63,8 +63,6 @@ namespace EcommerceAPI.Controllers
         }
 
         // PUT: api/Product/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("UpdateProduct/{id}")]
         public async Task<IActionResult> PutProduct(int id, ProductPutDTO product)
         {
@@ -104,8 +102,6 @@ namespace EcommerceAPI.Controllers
         }
 
         // POST: api/Product
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost("AddProduct")]
         public async Task<ActionResult<ProductAddDTO>> PostProduct(ProductAddDTO product)
         {
