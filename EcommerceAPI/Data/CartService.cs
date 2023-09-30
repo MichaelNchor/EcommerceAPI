@@ -59,7 +59,6 @@ namespace EcommerceAPI.Data
             if(min >= 0 && max >= 0 && max >= min)
             {
                 query = query.Where(cart =>
-                cart.Quantity.ToString().Contains(searchValue) ||
                 cart.Product.Any(product => product.UnitPrice >= min && product.UnitPrice <= max));
             }
 
