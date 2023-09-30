@@ -46,7 +46,7 @@ namespace EcommerceAPI.Data
         {
             var query = _dbcontext.Cart.AsQueryable();
 
-            if (!string.IsNullOrEmpty(searchValue) || (min >= 0 && max >= 0 && max >= min))
+            if (!string.IsNullOrEmpty(searchValue))
             {
                 // Filter carts based on the searchValue (e.g., quantity, product name, etc.)
                 query = query.Where(cart =>
@@ -54,6 +54,13 @@ namespace EcommerceAPI.Data
                 cart.Product.Any(product => product.ProductName.Contains(searchValue) ||
                 product.UnitPrice.ToString().Contains(searchValue) &&
                 product.UnitPrice >= min && product.UnitPrice <= max));
+            }
+
+            if(min >= 0 && max >= 0 && max >= min)
+            {
+                query = query.Where(cart =>
+                cart.Quantity.ToString().Contains(searchValue) ||
+                cart.Product.Any(product => product.UnitPrice >= min && product.UnitPrice <= max));
             }
 
             var carts = await query.Include(cart => cart.Product).ToListAsync();

@@ -4,11 +4,12 @@ using System;
 namespace EcommerceAPI.Tests
 {
     [TestClass]
-    public class UnitTest1
+    public class CartTests
     {
         [TestMethod]
-        public void TestMethod1()
+        public void GetCarts_ShouldReturnAllProducts()
         {
+            //var testProducts = GetTestProducts();
         }
     }
 }
