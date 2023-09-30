@@ -30,10 +30,6 @@ namespace EcommerceAPI.Migrations
                     b.Property<DateTime?>("AddedOn")
                         .HasColumnType("datetime");
 
-                    b.Property<int>("ProductId")
-                        .HasColumnName("ProductID")
-                        .HasColumnType("int");
-
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
 
@@ -55,6 +51,10 @@ namespace EcommerceAPI.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int?>("CartId")
+                        .HasColumnName("CartID")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("CreatedOn")
                         .HasColumnType("datetime");
 
@@ -72,7 +72,17 @@ namespace EcommerceAPI.Migrations
                         .HasName("PK1")
                         .HasAnnotation("SqlServer:Clustered", false);
 
+                    b.HasIndex("CartId");
+
                     b.ToTable("Product");
+                });
+
+            modelBuilder.Entity("EcommerceAPI.Models.Product", b =>
+                {
+                    b.HasOne("EcommerceAPI.Models.Cart", "Cart")
+                        .WithMany("Product")
+                        .HasForeignKey("CartId")
+                        .HasConstraintName("RefCart4");
                 });
 #pragma warning restore 612, 618
         }

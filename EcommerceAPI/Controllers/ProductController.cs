@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EcommerceAPI.Models;
 using EcommerceAPI.DTO.Product;
+using EcommerceAPI.Data;
 
 namespace EcommerceAPI.Controllers
 {
@@ -14,148 +15,76 @@ namespace EcommerceAPI.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly EcommerceAPIContext _context;
+        private readonly IProductService _service;
 
-        public ProductController(EcommerceAPIContext context)
+        public ProductController(IProductService service)
         {
-            _context = context;
+            _service = service;
         }
 
         // GET: api/Product
         [HttpGet("GetProducts")]
-        public async Task<ActionResult<IEnumerable<ProductGetDTO>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<ProductGetDTO>>> Get()
         {
-            var products = await _context.Product.ToListAsync();
+            var response = await _service.GetProducts();
 
-            var result = products.Select(p => new ProductGetDTO
-            {
-                ProductId = p.ProductId,
-                ProductName = p.ProductName,
-                UnitPrice = p.UnitPrice,
-                CreatedOn = p.CreatedOn,
-                UpdatedOn = p.UpdatedOn
-            });
-
-            return Ok(result);
+            return Ok(response);
         }
 
         // GET: api/Product/5
         [HttpGet("GetProduct/{id}")]
-        public async Task<ActionResult<ProductGetDTO>> GetProduct(int id)
+        public async Task<ActionResult<ProductGetDTO>> Get(int id)
         {
-            var product = await _context.Product.FindAsync(id);
+            var response = await _service.GetProduct(id);
 
-            if (product == null)
+            if(response == null)
             {
                 return NotFound();
             }
 
-            var result = new ProductGetDTO()
-            {
-                ProductId = product.ProductId,
-                ProductName = product.ProductName,
-                UnitPrice = product.UnitPrice,
-                CreatedOn = DateTime.UtcNow,
-                UpdatedOn = product.UpdatedOn,
-            };
-
-            return result;
+            return Ok(response);
         }
 
         // PUT: api/Product/5
         [HttpPut("UpdateProduct/{id}")]
-        public async Task<IActionResult> PutProduct(int id, ProductPutDTO product)
+        public async Task<IActionResult> Put(int id, ProductPutDTO product)
         {
-            var p = new Product()
-            {
-                ProductId = id,
-                ProductName = product.ProductName,
-                UnitPrice = product.UnitPrice,
-                CreatedOn = product.CreatedOn,
-                UpdatedOn = DateTime.UtcNow,
-            };
-
-            if (id != p.ProductId)
+            if (id != product.ProductId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(p).State = EntityState.Modified;
+            var response = await _service.UpdateProduct(id, product);
 
-            try
+            if(response == null)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound("product not found!");
             }
 
-            return NoContent();
+            return Ok(response);
         }
 
         // POST: api/Product
         [HttpPost("AddProduct")]
-        public async Task<ActionResult<ProductAddDTO>> PostProduct(ProductAddDTO product)
+        public async Task<ActionResult<ProductAddDTO>> Post(ProductAddDTO product)
         {
-            var p = new Product()
-            {
-                ProductName = product.ProductName,
-                UnitPrice = product.UnitPrice,
-                CreatedOn = DateTime.UtcNow,
-                UpdatedOn = DateTime.UtcNow,
-            };
+            var response = await _service.AddProduct(product);
 
-            _context.Product.Add(p);
-
-            await _context.SaveChangesAsync();
-
-            var result = new ProductAddDTO()
-            {
-                ProductId = product.ProductId,
-                ProductName = product.ProductName,
-                UnitPrice = product.UnitPrice,
-                CreatedOn = DateTime.UtcNow,
-            };
-
-            return CreatedAtAction("GetProduct", new { id = result.ProductId }, result);
+            return CreatedAtAction("GetProduct", new { id = response.ProductId }, response);
         }
 
         // DELETE: api/Product/5
         [HttpDelete("DeleteProduct/{id}")]
-        public async Task<ActionResult<ProductDeleteDTO>> DeleteProduct(int id)
+        public async Task<ActionResult<ProductDeleteDTO>> Delete(int id)
         {
-            var product = await _context.Product.FindAsync(id);
-            if (product == null)
+            var response = await _service.DeleteProduct(id);
+
+            if(response == null)
             {
-                return NotFound();
+                return NotFound("product doesn't exist!");
             }
 
-            _context.Product.Remove(product);
-
-            await _context.SaveChangesAsync();
-
-            var result = new ProductDeleteDTO()
-            {
-                ProductId = product.ProductId,
-                ProductName = product.ProductName,
-                UnitPrice = product.UnitPrice,
-                DeletedOn = DateTime.UtcNow,
-            };
-
-            return result;
-        }
-
-        private bool ProductExists(int id)
-        {
-            return _context.Product.Any(e => e.ProductId == id);
+            return Ok(response);
         }
     }
 }

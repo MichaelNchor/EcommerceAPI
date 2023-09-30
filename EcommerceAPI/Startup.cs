@@ -1,3 +1,4 @@
+using EcommerceAPI.Data;
 using EcommerceAPI.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,6 +33,9 @@ namespace EcommerceAPI
 
             services.AddDbContext<EcommerceAPIContext>(
                 options => options.UseSqlServer("name=ConnectionStrings:DefaultConnection"));
+
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<ICartService, CartService>();   
 
             services.AddSwaggerGen(options =>
             {
