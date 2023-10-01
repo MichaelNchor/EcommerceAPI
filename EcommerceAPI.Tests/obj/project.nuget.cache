@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "/VBRUUwZtr8nWgnc1vbAOp/mMJRO+HuRiV0JehHPr/9QcrVeYv61qsti4idn5g3wlBZXSXruzq5X/ivJnpzhcA==",
+  "dgSpecHash": "o8k7YBnrWMAraJDJHIfvY1xFHuIrsM6TQ6L90N4f/Pn2BuW7pmK5wdSPS3aEYbt5tZtBa6fAUXGI8SkVEm2Mmw==",
   "success": true,
   "projectFilePath": "C:\\Users\\NCHOR\\source\\repos\\MichaelNchor\\EcommerceAPI\\EcommerceAPI.Tests\\EcommerceAPI.Tests.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\NCHOR\\.nuget\\packages\\castle.core\\5.1.1\\castle.core.5.1.1.nupkg.sha512",
     "C:\\Users\\NCHOR\\.nuget\\packages\\coverlet.collector\\1.2.0\\coverlet.collector.1.2.0.nupkg.sha512",
     "C:\\Users\\NCHOR\\.nuget\\packages\\fluentassertions\\6.12.0\\fluentassertions.6.12.0.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.aspnetcore.html.abstractions\\2.2.0\\microsoft.aspnetcore.html.abstractions.2.2.0.nupkg.sha512",
@@ -82,6 +83,7 @@
     "C:\\Users\\NCHOR\\.nuget\\packages\\microsoft.visualstudio.web.codegeneration.utils\\3.1.5\\microsoft.visualstudio.web.codegeneration.utils.3.1.5.nupkg.sha512",
     "C:\\Users\\NCHOR\\.nuget\\packages\\microsoft.visualstudio.web.codegenerators.mvc\\3.1.5\\microsoft.visualstudio.web.codegenerators.mvc.3.1.5.nupkg.sha512",
     "C:\\Users\\NCHOR\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
+    "C:\\Users\\NCHOR\\.nuget\\packages\\moq\\4.20.69\\moq.4.20.69.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\newtonsoft.json\\11.0.2\\newtonsoft.json.11.0.2.nupkg.sha512",
     "C:\\Users\\NCHOR\\.nuget\\packages\\nuget.frameworks\\5.0.0\\nuget.frameworks.5.0.0.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\runtime.native.system\\4.3.0\\runtime.native.system.4.3.0.nupkg.sha512",
