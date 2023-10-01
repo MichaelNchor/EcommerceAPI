@@ -1,12 +1,13 @@
 using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace EcommerceAPI.Tests
 {
-    public class UnitTest1
+    public class ProductTests
     {
         [Fact]
-        public void Test1()
+        public void Get()
         {
 
         }
