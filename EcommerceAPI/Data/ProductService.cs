@@ -125,6 +125,7 @@ namespace EcommerceAPI.Data
         public async Task<ProductDeleteDTO> DeleteProduct(int id)
         {
             var product = await _dbcontext.Product.FindAsync(id);
+
             if (product == null)
             {
                 return null;

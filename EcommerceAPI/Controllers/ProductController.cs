@@ -28,6 +28,11 @@ namespace EcommerceAPI.Controllers
         {
             var response = await _service.GetProducts();
 
+            if (response == null)
+            {
+                return NotFound();
+            }
+
             return Ok(response);
         }
 
@@ -56,9 +61,9 @@ namespace EcommerceAPI.Controllers
 
             var response = await _service.UpdateProduct(id, product);
 
-            if(response == null)
+            if (response == null)
             {
-                return NotFound("product not found!");
+                return NotFound();
             }
 
             return Ok(response);
@@ -79,9 +84,9 @@ namespace EcommerceAPI.Controllers
         {
             var response = await _service.DeleteProduct(id);
 
-            if(response == null)
+            if (response == null)
             {
-                return NotFound("product doesn't exist!");
+                return NotFound();
             }
 
             return Ok(response);

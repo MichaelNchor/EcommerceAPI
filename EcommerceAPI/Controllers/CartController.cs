@@ -30,6 +30,11 @@ namespace EcommerceAPI.Controllers
         {
             var response = await _service.GetCarts();
 
+            if (response == null)
+            {
+                return NotFound();
+            }
+
             return Ok(response);
         }
 
