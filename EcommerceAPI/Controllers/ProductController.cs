@@ -24,7 +24,7 @@ namespace EcommerceAPI.Controllers
 
         // GET: api/Product
         [HttpGet("GetProducts")]
-        public async Task<ActionResult<IEnumerable<ProductGetDTO>>> Get()
+        public async Task<ActionResult<IEnumerable<ProductGetDTO>>> Gets()
         {
             var response = await _service.GetProducts();
 
