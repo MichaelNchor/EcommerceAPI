@@ -177,7 +177,7 @@ public class ProductControllerTests
     public async Task Post_ReturnsBadRequest_WhenModelStateIsInvalid()
     {
         // Arrange
-        var productAddDTO = new ProductAddDTO { ProductId = 1 , ProductName = "Blue Bag", UnitPrice = 3.22m, CreatedOn = DateTime.UtcNow };
+        var productAddDTO = new ProductAddDTO { ProductId = 1 };
         var mockService = new Mock<IProductService>();
 
         var controller = new ProductController(mockService.Object);
@@ -187,7 +187,7 @@ public class ProductControllerTests
         var result = await controller.Post(productAddDTO);
 
         // Assert
-        Assert.IsType<BadRequestObjectResult>(result.Result);
+        Assert.IsType<BadRequestResult>(result.Result);
     }
 
     [Fact]

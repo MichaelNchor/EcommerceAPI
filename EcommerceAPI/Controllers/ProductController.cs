@@ -73,9 +73,14 @@ namespace EcommerceAPI.Controllers
         [HttpPost("AddProduct")]
         public async Task<ActionResult<ProductAddDTO>> Post(ProductAddDTO product)
         {
-            var response = await _service.AddProduct(product);
+            if (ModelState.IsValid)
+            {
+                var response = await _service.AddProduct(product);
 
-            return CreatedAtAction("GetProduct", new { id = response.ProductId }, response);
+                return CreatedAtAction("GetProduct", new { id = response.ProductId }, response);
+            }
+
+            return BadRequest();
         }
 
         // DELETE: api/Product/5
