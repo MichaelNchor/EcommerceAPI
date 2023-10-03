@@ -19,23 +19,12 @@ namespace EcommerceAPI.Data
             _dbcontext = dbcontext;
         }
 
-        public async Task<IEnumerable<ProductGetDTO>> GetProducts()
+        public async Task<IEnumerable<Product>> GetProducts()
         {
-            var products = await _dbcontext.Product.ToListAsync();
-
-            var result = products.Select(p => new ProductGetDTO
-            {
-                ProductId = p.ProductId,
-                ProductName = p.ProductName,
-                UnitPrice = p.UnitPrice,
-                CreatedOn = p.CreatedOn,
-                UpdatedOn = p.UpdatedOn
-            });
-
-            return result;
+            return await _dbcontext.Product.ToListAsync();
         }
 
-        public async Task<ProductGetDTO> GetProduct(int id)
+        public async Task<Product> GetProduct(int id)
         {
             var product = await _dbcontext.Product.FindAsync(id);
 
@@ -44,85 +33,34 @@ namespace EcommerceAPI.Data
                 return null;
             }
 
-            var result = new ProductGetDTO()
-            {
-                ProductId = product.ProductId,
-                ProductName = product.ProductName,
-                UnitPrice = product.UnitPrice,
-                CreatedOn = DateTime.UtcNow,
-                UpdatedOn = product.UpdatedOn,
-            };
-
-            return result;
+            return product;
         }
 
-        public async Task<ProductPutDTO> UpdateProduct(int id, ProductPutDTO product)
+        public async Task<Product> UpdateProduct(Product product)
         {
-            var p = new Product()
-            {
-                ProductId = id,
-                ProductName = product.ProductName,
-                UnitPrice = product.UnitPrice,
-                CreatedOn = product.CreatedOn,
-                UpdatedOn = DateTime.UtcNow,
-            };
+            product.UpdatedOn = DateTime.UtcNow; 
 
-            try
-            {
-                _dbcontext.Entry(p).State = EntityState.Modified;
-
-                await _dbcontext.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
-                {
-                    return null;
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            var result = new ProductPutDTO()
-            {
-                ProductId = p.ProductId,
-                ProductName = p.ProductName,
-                UnitPrice = p.UnitPrice,
-                CreatedOn = p.CreatedOn,
-                UpdatedOn = p.UpdatedOn,
-            };
-
-            return result;
-        }
-
-        public async Task<ProductAddDTO> AddProduct(ProductAddDTO product)
-        {
-            var p = new Product()
-            {
-                ProductName = product.ProductName,
-                UnitPrice = product.UnitPrice,
-                CreatedOn = DateTime.UtcNow,
-                UpdatedOn = DateTime.UtcNow,
-            };
-
-            _dbcontext.Product.Add(p);
+            _dbcontext.Entry(product).State = EntityState.Modified;
 
             await _dbcontext.SaveChangesAsync();
 
-            var result = new ProductAddDTO()
-            {
-                ProductId = product.ProductId,
-                ProductName = product.ProductName,
-                UnitPrice = product.UnitPrice,
-                CreatedOn = DateTime.UtcNow,
-            };
-
-            return result;
+            return product;
         }
 
-        public async Task<ProductDeleteDTO> DeleteProduct(int id)
+        public async Task<Product> AddProduct(Product product)
+        {
+            product.CreatedOn = DateTime.UtcNow;
+
+            product.UpdatedOn = DateTime.UtcNow;
+
+            _dbcontext.Product.Add(product);
+
+            await _dbcontext.SaveChangesAsync();
+
+            return product;
+        }
+
+        public async Task<Product> DeleteProduct(int id)
         {
             var product = await _dbcontext.Product.FindAsync(id);
 
@@ -135,15 +73,7 @@ namespace EcommerceAPI.Data
 
             await _dbcontext.SaveChangesAsync();
 
-            var result = new ProductDeleteDTO()
-            {
-                ProductId = product.ProductId,
-                ProductName = product.ProductName,
-                UnitPrice = product.UnitPrice,
-                DeletedOn = DateTime.UtcNow,
-            };
-
-            return result;
+            return product;
         }
 
         public bool ProductExists(int id)

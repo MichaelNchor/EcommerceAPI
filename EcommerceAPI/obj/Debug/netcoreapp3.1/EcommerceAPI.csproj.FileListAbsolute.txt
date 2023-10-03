@@ -170,3 +170,6 @@ C:\Users\NCHOR\source\repos\MichaelNchor\EcommerceAPI\EcommerceAPI\bin\Debug\net
 C:\Users\NCHOR\source\repos\MichaelNchor\EcommerceAPI\EcommerceAPI\bin\Debug\netcoreapp3.1\runtimes\win-arm64\native\e_sqlite3.dll
 C:\Users\NCHOR\source\repos\MichaelNchor\EcommerceAPI\EcommerceAPI\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\e_sqlite3.dll
 C:\Users\NCHOR\source\repos\MichaelNchor\EcommerceAPI\EcommerceAPI\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\e_sqlite3.dll
+C:\Users\NCHOR\source\repos\MichaelNchor\EcommerceAPI\EcommerceAPI\bin\Debug\netcoreapp3.1\AutoMapper.dll
+C:\Users\NCHOR\source\repos\MichaelNchor\EcommerceAPI\EcommerceAPI\bin\Debug\netcoreapp3.1\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+C:\Users\NCHOR\source\repos\MichaelNchor\EcommerceAPI\EcommerceAPI\bin\Debug\netcoreapp3.1\System.Runtime.CompilerServices.Unsafe.dll

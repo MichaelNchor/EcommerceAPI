@@ -10,6 +10,8 @@ using EcommerceAPI.DTO.Product;
 using Microsoft.CodeAnalysis;
 using System.Net;
 using EcommerceAPI.Data;
+using AutoMapper;
+using EcommerceAPI.DTO.Cart;
 
 namespace EcommerceAPI.Controllers
 {
@@ -18,15 +20,17 @@ namespace EcommerceAPI.Controllers
     public class CartController : ControllerBase
     {
         private readonly ICartService _service;
+        private readonly IMapper _mapper;
 
-        public CartController(ICartService service)
+        public CartController(ICartService service, IMapper mapper)
         {
             _service = service;
+            _mapper = mapper;
         }
 
         // GET: api/Cart
-        [HttpGet("GetCartItems")]
-        public async Task<ActionResult<IEnumerable<Cart>>> GetCarts()
+        [HttpGet("GetCarts")]
+        public async Task<ActionResult> GetCarts()
         {
             var response = await _service.GetCarts();
 
@@ -35,12 +39,12 @@ namespace EcommerceAPI.Controllers
                 return NotFound();
             }
 
-            return Ok(response);
+            return Ok(response.Select(cart => _mapper.Map<CartGetDTO>(cart)).ToList());
         }
 
         // GET: api/carts/products
-        [HttpGet("GetCartItemsQueryable")]
-        public async Task<IActionResult> GetCartProductsAsync([FromQuery] string searchValue, decimal? minPrice, decimal? maxPrice)
+        [HttpGet("GetCartsQueryable")]
+        public async Task<ActionResult> GetCartsQuery([FromQuery] string searchValue, decimal? minPrice, decimal? maxPrice)
         {
 
             var response = await _service.GetCartsQueryable(searchValue, minPrice, maxPrice);
@@ -50,33 +54,33 @@ namespace EcommerceAPI.Controllers
                 return NotFound();
             }
 
-            return Ok(response);
+            return Ok(response.Select(cart => _mapper.Map<CartGetDTO>(cart)).ToList());
         }
 
         // GET: api/Cart/5
-        [HttpGet("GetCartItem/{id}")]
-        public async Task<ActionResult<Cart>> GetCart(int id)
+        [HttpGet("GetCart/{id}")]
+        public async Task<ActionResult> GetCart(int id)
         {
 
             var response = await _service.GetCartById(id);
 
             if (response == null)
             {
-                return NotFound("Cart not found!");
+                return NotFound();
             }
 
-            return Ok(response);
+            return Ok(_mapper.Map<CartGetDTO>(response));
         }
 
         // POST: api/Cart
-        [HttpPost("AddItemToCart")]
-        public async Task<ActionResult<Cart>> AddToCart(int productID, int quantity = 1)
+        [HttpPost("AddToCart")]
+        public async Task<ActionResult> AddToCart(int productID, int quantity = 1)
         {
             bool Productexists = _service.ProductExists(productID);
 
             if (!Productexists)
             {
-                return NotFound("Product doesn't exist! Add another.");
+                return NotFound();
             }
 
             try
@@ -94,7 +98,7 @@ namespace EcommerceAPI.Controllers
                     response = await _service.AddToNewCart(productID, quantity); 
                 }
 
-                return CreatedAtAction("GetCart", new { id = response.CartId }, response);
+                return Ok(_mapper.Map<CartGetDTO>(response));
             }
             catch (Exception ex)
             {
@@ -103,17 +107,17 @@ namespace EcommerceAPI.Controllers
         }
 
         // DELETE: api/Cart/5
-        [HttpDelete("RemoveItemToCart/{id}")]
+        [HttpDelete("RemoveToCart/{id}")]
         public async Task<ActionResult<Cart>> DeleteCart(int id)
         {
             var response = await _service.DeleteCart(id);
 
             if(response == null)
             {
-                return NotFound("Cart not found!");
+                return NotFound();
             }
 
-            return Ok(response);
+            return Ok(_mapper.Map<CartGetDTO>(response));
         }
     }
 }

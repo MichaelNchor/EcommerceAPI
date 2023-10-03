@@ -18,31 +18,12 @@ namespace EcommerceAPI.Data
             _dbcontext = dbcontext;
         }
 
-        public async Task<IEnumerable<dynamic>> GetCarts()
+        public async Task<IEnumerable<Cart>> GetCarts()
         {
-            var carts = await _dbcontext.Cart.Include(c => c.Product).ToListAsync();
-
-            //Reshape response
-            var result = carts.Select(cart => new
-            {
-                CartId = cart.CartId,
-                Quantity = cart.Quantity,
-                AddedOn = cart.AddedOn,
-                UpdatedOn = cart.UpdatedOn,
-                Products = cart.Product.Select(product => new
-                {
-                    ProductId = product.ProductId,
-                    ProductName = product.ProductName,
-                    UnitPrice = product.UnitPrice,
-                    CreatedOn = product.CreatedOn,
-                    UpdatedOn = product.UpdatedOn,
-                }).ToList()
-            }).ToList();
-
-            return result;
+            return await _dbcontext.Cart.Include(c => c.Product).ToListAsync();
         }
 
-        public async Task<IEnumerable<dynamic>> GetCartsQueryable([FromQuery] string searchValue, decimal? min, decimal? max)
+        public async Task<IEnumerable<Cart>> GetCartsQueryable([FromQuery] string searchValue, decimal? min, decimal? max)
         {
             var query = _dbcontext.Cart.AsQueryable();
 
@@ -64,27 +45,10 @@ namespace EcommerceAPI.Data
 
             var carts = await query.Include(cart => cart.Product).ToListAsync();
 
-            // Reshape response
-            var result = carts.Select(cart => new
-            {
-                CartId = cart.CartId,
-                Quantity = cart.Quantity,
-                AddedOn = cart.AddedOn,
-                UpdatedOn = cart.UpdatedOn,
-                Products = cart.Product.Select(product => new
-                {
-                    ProductId = product.ProductId,
-                    ProductName = product.ProductName,
-                    UnitPrice = product.UnitPrice,
-                    CreatedOn = product.CreatedOn,
-                    UpdatedOn = product.UpdatedOn,
-                }).ToList()
-            });
-
-            return result;
+            return carts;
         }
 
-        public async Task<dynamic> GetCartById(int id)
+        public async Task<Cart> GetCartById(int id)
         {
             var cart = await _dbcontext.Cart.Include(c => c.Product).FirstOrDefaultAsync(c => c.Product.Any(p => p.CartId == id));
 
@@ -93,27 +57,10 @@ namespace EcommerceAPI.Data
                 return null;
             }
 
-            //Reshape response
-            var result = new
-            {
-                CartId = cart.CartId,
-                Quantity = cart.Quantity,
-                AddedOn = cart.AddedOn,
-                UpdatedOn = cart.UpdatedOn,
-                Products = cart.Product.Select(product => new
-                {
-                    ProductId = product.ProductId,
-                    ProductName = product.ProductName,
-                    UnitPrice = product.UnitPrice,
-                    CreatedOn = product.CreatedOn,
-                    UpdatedOn = product.UpdatedOn,
-                }).ToList()
-            };
-
-            return result;
+            return cart;
         }
 
-        public async Task<dynamic> AddToNewCart(int productID, int quantity = 1)
+        public async Task<Cart> AddToNewCart(int productID, int quantity = 1)
         {
             var product = await _dbcontext.Product.FirstOrDefaultAsync(c => c.ProductId == productID);
 
@@ -130,27 +77,10 @@ namespace EcommerceAPI.Data
 
             await _dbcontext.SaveChangesAsync();
 
-            //Reshape response
-            var result = new
-            {
-                CartId = cart.CartId,
-                Quantity = cart.Quantity,
-                AddedOn = cart.AddedOn,
-                UpdatedOn = cart.UpdatedOn,
-                Products = cart.Product.Select(product => new
-                {
-                    ProductId = product.ProductId,
-                    ProductName = product.ProductName,
-                    UnitPrice = product.UnitPrice,
-                    CreatedOn = product.CreatedOn,
-                    UpdatedOn = product.UpdatedOn,
-                }).ToList()
-            };
-
-            return result;
+            return cart;
         }
 
-        public async Task<dynamic> UpdateExistingCart(int productID, int quantity = 1)
+        public async Task<Cart> UpdateExistingCart(int productID, int quantity = 1)
         {
             var cart = _dbcontext.Cart.Include(c => c.Product).FirstOrDefault(c => c.Product.Any(p => p.ProductId == productID));
 
@@ -161,27 +91,10 @@ namespace EcommerceAPI.Data
 
             await _dbcontext.SaveChangesAsync();
 
-            //Reshape response
-            var result = new
-            {
-                CartId = cart.CartId,
-                Quantity = cart.Quantity,
-                AddedOn = cart.AddedOn,
-                UpdatedOn = cart.UpdatedOn,
-                Products = cart.Product.Select(product => new
-                {
-                    ProductId = product.ProductId,
-                    ProductName = product.ProductName,
-                    UnitPrice = product.UnitPrice,
-                    CreatedOn = product.CreatedOn,
-                    UpdatedOn = product.UpdatedOn,
-                }).ToList()
-            };
-
-            return result;
+            return cart;
         }
 
-        public async Task<dynamic> DeleteCart(int id)
+        public async Task<Cart> DeleteCart(int id)
         {
             var cart = await _dbcontext.Cart.FindAsync(id);
 
@@ -202,23 +115,7 @@ namespace EcommerceAPI.Data
 
             await _dbcontext.SaveChangesAsync();
 
-            var result = new
-            {
-                CartId = cart.CartId,
-                Quantity = cart.Quantity,
-                AddedOn = cart.AddedOn,
-                UpdatedOn = cart.UpdatedOn,
-                Products = cart.Product.Select(product => new
-                {
-                    ProductId = product.ProductId,
-                    ProductName = product.ProductName,
-                    UnitPrice = product.UnitPrice,
-                    CreatedOn = product.CreatedOn,
-                    UpdatedOn = product.UpdatedOn,
-                }).ToList()
-            };
-
-            return result;
+            return cart;
         }
 
         public bool CartExistsWithProduct(int id)

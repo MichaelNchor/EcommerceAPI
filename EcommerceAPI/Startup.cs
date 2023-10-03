@@ -34,6 +34,8 @@ namespace EcommerceAPI
             services.AddDbContext<EcommerceAPIContext>(
                 options => options.UseSqlServer("name=ConnectionStrings:DefaultConnection"));
 
+            services.AddAutoMapper(typeof(Startup));
+
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<ICartService, CartService>();   
 

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using EcommerceAPI.Models;
 using EcommerceAPI.DTO.Product;
 using EcommerceAPI.Data;
+using AutoMapper;
 
 namespace EcommerceAPI.Controllers
 {
@@ -16,15 +17,17 @@ namespace EcommerceAPI.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _service;
+        private readonly IMapper _mapper;
 
-        public ProductController(IProductService service)
+        public ProductController(IProductService service, IMapper mapper)
         {
             _service = service;
+            _mapper = mapper;
         }
 
         // GET: api/Product
         [HttpGet("GetProducts")]
-        public async Task<ActionResult<IEnumerable<ProductGetDTO>>> Gets()
+        public async Task<ActionResult> Gets()
         {
             var response = await _service.GetProducts();
 
@@ -33,12 +36,12 @@ namespace EcommerceAPI.Controllers
                 return NotFound();
             }
 
-            return Ok(response);
+            return Ok(_mapper.Map<IEnumerable<ProductGetDTO>>(response));
         }
 
         // GET: api/Product/5
         [HttpGet("GetProduct/{id}")]
-        public async Task<ActionResult<ProductGetDTO>> Get(int id)
+        public async Task<ActionResult> Get(int id)
         {
             var response = await _service.GetProduct(id);
 
@@ -47,7 +50,7 @@ namespace EcommerceAPI.Controllers
                 return NotFound();
             }
 
-            return Ok(response);
+            return Ok(_mapper.Map<ProductGetDTO>(response));
         }
 
         // PUT: api/Product/5
@@ -59,25 +62,37 @@ namespace EcommerceAPI.Controllers
                 return BadRequest();
             }
 
-            var response = await _service.UpdateProduct(id, product);
-
-            if (response == null)
+            if (ModelState.IsValid)
             {
-                return NotFound();
+                var response = await _service.UpdateProduct(_mapper.Map<Product>(product));
+
+                if (response == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(response);
             }
 
-            return Ok(response);
+            return BadRequest();
         }
 
         // POST: api/Product
         [HttpPost("AddProduct")]
-        public async Task<ActionResult<ProductAddDTO>> Post(ProductAddDTO product)
+        public async Task<ActionResult> Post(ProductAddDTO product)
         {
             if (ModelState.IsValid)
             {
-                var response = await _service.AddProduct(product);
+                var prod = _mapper.Map<Product>(product);
 
-                return CreatedAtAction("GetProduct", new { id = response.ProductId }, response);
+                var response = await _service.AddProduct(prod);
+
+                if(response == null)
+                {
+                    return BadRequest();
+                }
+
+                return Ok(_mapper.Map<ProductAddDTO>(response));
             }
 
             return BadRequest();
@@ -85,7 +100,7 @@ namespace EcommerceAPI.Controllers
 
         // DELETE: api/Product/5
         [HttpDelete("DeleteProduct/{id}")]
-        public async Task<ActionResult<ProductDeleteDTO>> Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
             var response = await _service.DeleteProduct(id);
 

@@ -7,13 +7,13 @@ namespace EcommerceAPI.Data
 {
     public interface ICartService
     {
-        Task<dynamic> AddToNewCart(int productID, int quantity = 1);
+        Task<Cart> AddToNewCart(int productID, int quantity = 1);
         bool CartExistsWithProduct(int id);
-        Task<dynamic> DeleteCart(int id);
-        Task<dynamic> GetCartById(int id);
-        Task<IEnumerable<dynamic>> GetCarts();
-        Task<IEnumerable<dynamic>> GetCartsQueryable([FromQuery] string searchValue, decimal? min, decimal? max);
+        Task<Cart> DeleteCart(int id);
+        Task<Cart> GetCartById(int id);
+        Task<IEnumerable<Cart>> GetCarts();
+        Task<IEnumerable<Cart>> GetCartsQueryable([FromQuery] string searchValue, decimal? min, decimal? max);
         bool ProductExists(int id);
-        Task<dynamic> UpdateExistingCart(int productID, int quantity = 1);
+        Task<Cart> UpdateExistingCart(int productID, int quantity = 1);
     }
 }
